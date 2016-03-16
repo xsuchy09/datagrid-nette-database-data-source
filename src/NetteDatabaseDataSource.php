@@ -50,14 +50,12 @@ class NetteDatabaseDataSource extends FilterableDataSource implements IDataSourc
 	 * @param Context $connection
 	 * @param array   $sql
 	 */
-	public function __construct(Context $connection, $sql)
+	public function __construct(Context $connection, $sql, array $params = [])
 	{
 		$this->connection = $connection;
 		$this->sql = $sql;
 
-		$this->query_parameters = func_get_args();
-		array_shift($this->query_parameters);
-		array_shift($this->query_parameters);
+		$this->query_parameters = $params;
 
 		$this->queryHelper = new QueryHelper($this->sql);
 	}

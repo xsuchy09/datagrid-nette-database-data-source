@@ -30,7 +30,6 @@ final class NetteDatabaseDataSourceTest extends TestCase
 
 	public function setUp()
 	{
-		\Tracy\Debugger::enable();
 		$connection = new Connection('.', NULL, NULL, ['lazy' => TRUE]);
 
 		$structure = new Structure($connection, new DevNullStorage);
@@ -87,9 +86,9 @@ final class NetteDatabaseDataSourceTest extends TestCase
 				ON p2.id = u.father_id
 			JOIN (SELECT id, age FROM parent) p3
 				ON p3.age = u.age
-			WHERE p2.id != 2 OR p2.id NOT IN (3, 4)';
+			WHERE p2.id != 2 OR p2.id NOT IN (?, ?)';
 
-		$s = new NetteDatabaseDataSource($this->db, $q);
+		$s = new NetteDatabaseDataSource($this->db, $q, [3, 4]);
 
 		$filter1 = new FilterSelect('status', 'Status', [1 => 'Online', 0 => 'Offline'], 'user.status');
 		$filter1->setValue(1);
@@ -100,7 +99,7 @@ final class NetteDatabaseDataSourceTest extends TestCase
 		$filter3 = new FilterRange('range', 'Range', 'id', 'To');
 		$filter3->setValue(['from' => 2, 'to' => NULL]);
 
-		$filter4 = new FilterDateRange('date range', 'Date Range', 'created');
+		$filter4 = new FilterDateRange('date range', 'Date Range', 'created', '-');
 		$filter4->setValue(['from' => '1. 2. 2003', 'to' => '3. 12. 2149']);
 
 		$filter5 = new FilterDate('date', 'Date', 'date');
@@ -123,7 +122,7 @@ final class NetteDatabaseDataSourceTest extends TestCase
 				ON p2.id = u.father_id
 			INNER JOIN (SELECT id, age FROM parent) p3
 				ON p3.age = u.age
-			WHERE (p2.id != 2 OR p2.id NOT IN (3, 4))
+			WHERE (p2.id != 2 OR p2.id NOT IN (?, ?))
 				AND user.status = ?
 				AND ((name LIKE ?) OR (id LIKE ?))
 				AND id >= ?
@@ -134,6 +133,8 @@ final class NetteDatabaseDataSourceTest extends TestCase
 		Assert::same(trim(preg_replace('/\s+/', ' ', $expected_query)), $q[0]);
 
 		$expected_params = [
+			3,
+			4,
 			1,
 			"%text%",
 			"%text%",
