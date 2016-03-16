@@ -1,0 +1,39 @@
+{
+	"name": "ublaboo/datagrid-nette-database-data-source",
+	"type": "library",
+	"description": "Utility that makes possible to use Nette\\Database native query with Ublaboo\\DataGrid",
+	"keywords": ["datagrid", "grid", "nette", "ublaboo", "database", "data", "source"],
+	"homepage": "http://ublaboo.paveljanda.com/datagrid-nette-database-data-source",
+	"license": ["MIT"],
+	"support": {
+		"issues": "https://github.com/ublaboo/datagrid-nette-database-data-source/issues"
+	},
+	"authors": [
+		{
+			"name": "Pavel Janda",
+			"homepage": "http://paveljanda.com"
+		}
+	],
+	"autoload": {
+		"psr-4": {
+			"Ublaboo\\NetteDatabaseDataSource\\": "src/"
+		}
+	},
+	"autoload-dev": {
+		"psr-4": {
+			"Ublaboo\\NetteDatabaseDataSource\\Tests\\": "tests"
+		}
+	},
+	"require": {
+		"nette/application" : "~2.3.0",
+		"ublaboo/datagrid" : "dev-master",
+		"nette/database" : "~2.3.0",
+		"nette/caching" : "~2.3",
+		"greenlion/php-sql-parser" : "~4.0"
+	},
+	"require-dev": {
+		"nette/tester" : "~1.6.1",
+		"tracy/tracy" : "~2.3.0",
+		"mockery/mockery" : "~0.9"
+	}
+}
