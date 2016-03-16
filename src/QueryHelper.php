@@ -56,6 +56,9 @@ class QueryHelper
 	}
 
 
+	/**
+	 * @return string
+	 */
 	public function getCountSelect()
 	{
 		$query = $this->query;
@@ -83,6 +86,11 @@ class QueryHelper
 	}
 
 
+	/**
+	 * @param  int $limit
+	 * @param  int $offset
+	 * @return string
+	 */
 	public function limit($limit, $offset)
 	{
 		$this->query['LIMIT'] = [
@@ -94,6 +102,11 @@ class QueryHelper
 	}
 
 
+	/**
+	 * @param  string $column
+	 * @param  string $order
+	 * @return string
+	 */
 	public function orderBy($column, $order)
 	{
 		$this->query['ORDER'] = [[
@@ -111,6 +124,12 @@ class QueryHelper
 	}
 
 
+	/**
+	 * @param  string $column
+	 * @param  mixed  $value
+	 * @param  string $operator
+	 * @return string
+	 */
 	public function where($column, $value, $operator)
 	{
 		if (empty($this->query['WHERE'])) {
@@ -179,6 +198,10 @@ class QueryHelper
 	}
 
 
+	/**
+	 * @param  string $sql
+	 * @return string
+	 */
 	public function whereSql($sql)
 	{
 		if (empty($this->query['WHERE'])) {

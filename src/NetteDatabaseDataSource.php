@@ -48,7 +48,7 @@ class NetteDatabaseDataSource extends FilterableDataSource implements IDataSourc
 
 	/**
 	 * @param Context $connection
-	 * @param array   $query
+	 * @param array   $sql
 	 */
 	public function __construct(Context $connection, $sql)
 	{
@@ -63,6 +63,10 @@ class NetteDatabaseDataSource extends FilterableDataSource implements IDataSourc
 	}
 
 
+	/**
+	 * Get current sql + query parameters
+	 * @return array
+	 */
 	public function getQuery()
 	{
 		$sql = preg_replace('/_\?\w{13}\?_/', '?', $this->sql);
@@ -71,6 +75,10 @@ class NetteDatabaseDataSource extends FilterableDataSource implements IDataSourc
 	}
 
 
+	/**
+	 * @param string $sql
+	 * @return array
+	 */
 	protected function addParams($sql)
 	{
 		$params = $this->query_parameters;
@@ -81,6 +89,11 @@ class NetteDatabaseDataSource extends FilterableDataSource implements IDataSourc
 	}
 
 
+	/**
+	 * Call Context::query() with current sql + params
+	 * @param  string $sql
+	 * @return Nette\Database\ResultSet
+	 */
 	protected function query($sql)
 	{
 		$sql = preg_replace('/_\?\w{13}\?_/', '?', $sql);
@@ -89,6 +102,12 @@ class NetteDatabaseDataSource extends FilterableDataSource implements IDataSourc
 	}
 
 
+	/**
+	 * @param  string $column
+	 * @param  mixed $value
+	 * @param  string $operator
+	 * @return void
+	 */
 	protected function applyWhere($column, $value, $operator = '=')
 	{
 		$id = '_?' . uniqid() . '?_';
