@@ -16,8 +16,11 @@ use Ublaboo\DataGrid\Filter\FilterText;
 use Ublaboo\DataGrid\Filter\FilterDate;
 use Ublaboo\DataGrid\Filter\FilterDateRange;
 use Ublaboo\DataGrid\Filter\FilterRange;
+use Ublaboo;
 
 require __DIR__ . '/../bootstrap.php';
+require __DIR__ . '/../Files/XTestingDataGridFactory.php';
+require __DIR__ . '/../Files/XTestingPresenter.php';
 
 final class NetteDatabaseDataSourceTest extends TestCase
 {
@@ -27,6 +30,11 @@ final class NetteDatabaseDataSourceTest extends TestCase
 	 */
 	private $db;
 
+	/**
+	 * @var Ublaboo\DataGrid\DataGrid
+	 */
+	private $grid;
+
 
 	public function setUp()
 	{
@@ -34,6 +42,9 @@ final class NetteDatabaseDataSourceTest extends TestCase
 
 		$structure = new Structure($connection, new DevNullStorage);
 		$this->db = new Context($connection, $structure);
+
+		$factory = new Ublaboo\DataGrid\Tests\Files\XTestingDataGridFactory;
+		$this->grid = $factory->createXTestingDataGrid();
 	}
 
 
@@ -64,7 +75,7 @@ final class NetteDatabaseDataSourceTest extends TestCase
 	public function testApplyFilterSelect()
 	{
 		$s = new NetteDatabaseDataSource($this->db, 'SELECT * FROM user');
-		$filter = new FilterSelect('status', 'Status', [1 => 'Online', 0 => 'Offline'], 'user.status');
+		$filter = new FilterSelect($this->grid, 'status', 'Status', [1 => 'Online', 0 => 'Offline'], 'user.status');
 		$filter->setValue(1);
 
 		$s->applyFilterSelect($filter);
@@ -90,19 +101,19 @@ final class NetteDatabaseDataSourceTest extends TestCase
 
 		$s = new NetteDatabaseDataSource($this->db, $q, [3, 4]);
 
-		$filter1 = new FilterSelect('status', 'Status', [1 => 'Online', 0 => 'Offline'], 'user.status');
+		$filter1 = new FilterSelect($this->grid, 'status', 'Status', [1 => 'Online', 0 => 'Offline'], 'user.status');
 		$filter1->setValue(1);
 
-		$filter2 = new FilterText('name', 'Name or id', ['name', 'id']);
+		$filter2 = new FilterText($this->grid, 'name', 'Name or id', ['name', 'id']);
 		$filter2->setValue('text');
 
-		$filter3 = new FilterRange('range', 'Range', 'id', 'To');
+		$filter3 = new FilterRange($this->grid, 'range', 'Range', 'id', 'To');
 		$filter3->setValue(['from' => 2, 'to' => NULL]);
 
-		$filter4 = new FilterDateRange('date range', 'Date Range', 'created', '-');
+		$filter4 = new FilterDateRange($this->grid, 'date range', 'Date Range', 'created', '-');
 		$filter4->setValue(['from' => '1. 2. 2003', 'to' => '3. 12. 2149']);
 
-		$filter5 = new FilterDate('date', 'Date', 'date');
+		$filter5 = new FilterDate($this->grid, 'date', 'Date', 'date');
 		$filter5->setValue('12. 12. 2012');
 
 		$s->applyFilterSelect($filter1);
