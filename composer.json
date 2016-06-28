@@ -26,7 +26,7 @@
 	},
 	"require": {
 		"nette/application" : "~2.3.0",
-		"ublaboo/datagrid" : "~2.3|~3.0",
+		"ublaboo/datagrid" : "~2.3|~3.0|~4.0",
 		"nette/database" : "~2.3.0",
 		"nette/caching" : "~2.3",
 		"greenlion/php-sql-parser" : "~4.0"
