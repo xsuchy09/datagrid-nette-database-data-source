@@ -25,15 +25,15 @@
 		}
 	},
 	"require": {
-		"nette/application" : "~2.3.0",
+		"nette/application" : "^2.3|^2.4",
 		"ublaboo/datagrid" : "~2.3|~3.0",
-		"nette/database" : "~2.3.0",
-		"nette/caching" : "~2.3",
+		"nette/database" : "^2.3|^2.4",
+		"nette/caching" : "^2.3|^2.4",
 		"greenlion/php-sql-parser" : "~4.0"
 	},
 	"require-dev": {
 		"nette/tester" : "~1.6.1",
-		"tracy/tracy" : "~2.3.0",
+		"tracy/tracy" : "^2.3|^2.4",
 		"mockery/mockery" : "~0.9"
 	}
 }
