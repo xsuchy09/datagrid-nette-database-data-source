@@ -272,9 +272,11 @@ class NetteDatabaseDataSource extends FilterableDataSource implements IDataSourc
 			$or = substr($big_or, 0, strlen($big_or) - 4).')';
 
 			$args = $big_or_args;
+		} else {
+			$or = reset($or);
 		}
 
-		$this->queryHelper->whereSql($or);
+		$this->sql = $this->queryHelper->whereSql($or);
 
 		foreach ($args as $arg) {
 			$this->query_parameters[] = $arg;
