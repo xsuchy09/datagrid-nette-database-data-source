@@ -12,6 +12,7 @@ use Nette\Database\Context;
 use Ublaboo\DataGrid\Filter;
 use Ublaboo\DataGrid\Utils\Sorting;
 use Ublaboo\DataGrid\DataSource\IDataSource;
+use Nette\Utils\Callback;
 use Ublaboo\NetteDatabaseDataSource\Exception\NetteDatabaseDataSourceException;
 
 class NetteDatabaseDataSource implements IDataSource
