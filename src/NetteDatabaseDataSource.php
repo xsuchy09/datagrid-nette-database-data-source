@@ -11,11 +11,10 @@ namespace Ublaboo\NetteDatabaseDataSource;
 use Nette\Database\Context;
 use Ublaboo\DataGrid\Filter;
 use Ublaboo\DataGrid\Utils\Sorting;
-use Ublaboo\DataGrid\DataSource\FilterableDataSource;
 use Ublaboo\DataGrid\DataSource\IDataSource;
 use Ublaboo\NetteDatabaseDataSource\Exception\NetteDatabaseDataSourceException;
 
-class NetteDatabaseDataSource extends FilterableDataSource implements IDataSource
+class NetteDatabaseDataSource implements IDataSource
 {
 
 	/**
@@ -133,6 +132,42 @@ class NetteDatabaseDataSource extends FilterableDataSource implements IDataSourc
 	/********************************************************************************
 	 *                          IDataSource implementation                          *
 	 ********************************************************************************/
+
+
+	/**
+	 * Filter data
+	 * @param array $filters
+	 * @return static
+	 */
+	public function filter(array $filters)
+	{
+		foreach ($filters as $filter) {
+			if ($filter->isValueSet()) {
+				if ($filter->hasConditionCallback()) {
+					$this->sql = Callback::invokeArgs(
+						$filter->getConditionCallback(),
+						[$this->sql, $filter->getValue(), $this->query_parameters]
+					);
+				} else {
+					if ($filter instanceof Filter\FilterText) {
+						$this->applyFilterText($filter);
+					} else if ($filter instanceof Filter\FilterMultiSelect) {
+						$this->applyFilterMultiSelect($filter);
+					} else if ($filter instanceof Filter\FilterSelect) {
+						$this->applyFilterSelect($filter);
+					} else if ($filter instanceof Filter\FilterDate) {
+						$this->applyFilterDate($filter);
+					} else if ($filter instanceof Filter\FilterDateRange) {
+						$this->applyFilterDateRange($filter);
+					} else if ($filter instanceof Filter\FilterRange) {
+						$this->applyFilterRange($filter);
+					}
+				}
+			}
+		}
+
+		return $this;
+	}
 
 
 	/**
