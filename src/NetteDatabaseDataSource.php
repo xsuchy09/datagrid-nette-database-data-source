@@ -145,9 +145,9 @@ class NetteDatabaseDataSource implements IDataSource
 		foreach ($filters as $filter) {
 			if ($filter->isValueSet()) {
 				if ($filter->hasConditionCallback()) {
-					$this->sql = Callback::invokeArgs(
+					$this->sql = call_user_func_array(
 						$filter->getConditionCallback(),
-						[$this->sql, $filter->getValue(), $this->query_parameters]
+						[$this->sql, $filter->getValue(), & $this->query_parameters]
 					);
 				} else {
 					if ($filter instanceof Filter\FilterText) {
