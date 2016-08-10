@@ -29,6 +29,12 @@ class QueryHelper
 	}
 
 
+	public function resetQuery($sql)
+	{
+		$this->query = $this->prepare($this->sqlParser->parse($sql));
+	}
+
+
 	/**
 	 * In case query contains a more complicated query, place it within brackets: (<complicated_expr>)
 	 * @param  array $query

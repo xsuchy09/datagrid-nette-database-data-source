@@ -149,6 +149,7 @@ class NetteDatabaseDataSource implements IDataSource
 						$filter->getConditionCallback(),
 						[$this->sql, $filter->getValue(), & $this->query_parameters]
 					);
+					$this->queryHelper->resetQuery($this->sql);
 				} else {
 					if ($filter instanceof Filter\FilterText) {
 						$this->applyFilterText($filter);
