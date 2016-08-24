@@ -333,6 +333,43 @@ class NetteDatabaseDataSource implements IDataSource
 		}
 	}
 
+	/**
+	 * Filter by multiselect value
+	 * @param  Filter\FilterMultiSelect $filter
+	 * @return void
+	 */
+	public function applyFilterMultiSelect(Filter\FilterMultiSelect $filter)
+	{
+		$or = [];
+		$args = [];
+		$big_or = [];
+		$big_or_args = [];
+		$condition = $filter->getCondition();
+		foreach ($condition as $column => $values) {
+			$queryPart = '(';
+			foreach ($values as $value) {
+				$queryPart .= "$column = ? OR ";
+				$args[] = $value;
+			}
+			$queryPart = substr($queryPart, 0, strlen($queryPart) - 4).')';
+			$or[] = $queryPart;
+			$big_or .= "$queryPart OR ";
+			$big_or_args = array_merge($big_or_args, $args);
+		}
+
+		if (sizeof($or) > 1) {
+			$or = substr($big_or, 0, strlen($big_or) - 4).')';
+			$args = $big_or_args;
+		} else {
+			$or = reset($or);
+		}
+		
+		$this->sql = $this->queryHelper->whereSql($or);
+
+		foreach ($args as $arg) {
+			$this->query_parameters[] = $arg;
+		}
+	}
 
 	/**
 	 * Apply limit and offet on data
