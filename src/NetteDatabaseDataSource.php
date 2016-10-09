@@ -342,7 +342,7 @@ class NetteDatabaseDataSource implements IDataSource
 	{
 		$or = [];
 		$args = [];
-		$big_or = [];
+		$big_or = '';
 		$big_or_args = [];
 		$condition = $filter->getCondition();
 		foreach ($condition as $column => $values) {
