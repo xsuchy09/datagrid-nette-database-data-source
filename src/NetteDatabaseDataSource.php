@@ -45,6 +45,11 @@ class NetteDatabaseDataSource implements IDataSource
 	 */
 	protected $sqlParser;
 
+	/**
+	 * @var QueryHelper
+	 */
+	protected $queryHelper;
+
 
 	/**
 	 * @param Context $connection
