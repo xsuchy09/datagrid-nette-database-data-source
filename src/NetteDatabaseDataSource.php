@@ -52,7 +52,6 @@ class NetteDatabaseDataSource implements IDataSource
 
 
 	/**
-	 * NetteDatabaseDataSource constructor.
 	 * @param Context $connection
 	 * @param string $sql
 	 * @param array $params
