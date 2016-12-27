@@ -53,7 +53,8 @@ class NetteDatabaseDataSource implements IDataSource
 
 	/**
 	 * @param Context $connection
-	 * @param array   $sql
+	 * @param string $sql
+	 * @param array $params
 	 */
 	public function __construct(Context $connection, $sql, array $params = [])
 	{
