@@ -185,8 +185,9 @@ class NetteDatabaseDataSource implements IDataSource
 	public function getCount()
 	{
 		$sql = $this->queryHelper->getCountSelect();
-
-		return $this->query($sql)->fetch()->count;
+		$query = $this->query($sql)->fetch();
+		
+		return ($query) ? $query->count : 0;
 	}
 
 
