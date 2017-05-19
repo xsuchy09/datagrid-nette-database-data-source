@@ -1,6 +1,6 @@
 <?php
 
-namespace Ublaboo\DataGrid\Tests\Files;
+namespace Ublaboo\DataGrid\Nette\Database\Tests\Files;
 
 use Nette\Http,
 	Nette;
