@@ -293,16 +293,24 @@ class NetteDatabaseDataSource implements IDataSource
 		$big_or = '(';
 		$big_or_args = [];
 		$condition = $filter->getCondition();
+		$isSeachExact = $filter->isExactSearch();
+		$operator = $isSeachExact ? '=' : 'LIKE';
 
 		foreach ($condition as $column => $value) {
-			$words = explode(' ', $value);
 
 			$like = '(';
 			$args = [];
 
-			foreach ($words as $word) {
-				$like .= "$column LIKE ? OR ";
-				$args[] = "%$word%";
+			if ($filter->hasSplitWordsSearch() === FALSE) {
+				$like .= "$column $operator ? OR ";
+				$args[] = $isSeachExact ? $value :"%$value%";
+			}else{
+				$words = explode(' ', $value);
+
+				foreach ($words as $word) {
+					$like .= "$column $operator ? OR ";
+					$args[] = $isSeachExact ? $word : "%$word%";
+				}
 			}
 
 			$like = substr($like, 0, strlen($like) - 4).')';

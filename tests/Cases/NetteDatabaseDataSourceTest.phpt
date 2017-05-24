@@ -85,6 +85,81 @@ final class NetteDatabaseDataSourceTest extends TestCase
 		Assert::same([1], $q[1]);
 	}
 
+	public function testApplyFilterText()
+	{
+		$s = new NetteDatabaseDataSource($this->db, 'SELECT * FROM user');
+		$filter = new FilterText($this->grid, 'name', 'Name', ['name']);
+		$filter->setValue('text');
+		$s->applyFilterText($filter);
+		$q = $s->getQuery();
+
+		Assert::same('SELECT * FROM user WHERE (name LIKE ?)', $q[0]);
+		Assert::same(['%text%'], $q[1]);
+	}
+
+	public function testApplyFilterTextDouble()
+	{
+		$s = new NetteDatabaseDataSource($this->db, 'SELECT * FROM user');
+		$filter = new FilterText($this->grid, 'name', 'Name or id', ['name', 'id']);
+		$filter->setValue('text');
+		$s->applyFilterText($filter);
+		$q = $s->getQuery();
+
+		Assert::same('SELECT * FROM user WHERE ((name LIKE ?) OR (id LIKE ?))', $q[0]);
+		Assert::same(['%text%', '%text%'], $q[1]);
+	}
+
+	public function testApplyFilterTextSplitWordsSearch()
+	{
+		$s = new NetteDatabaseDataSource($this->db, 'SELECT * FROM user');
+		$filter = new FilterText($this->grid, 'name', 'Name or id', ['name', 'id']);
+		$filter->setValue('text alternative');
+		$s->applyFilterText($filter);
+		$q = $s->getQuery();
+
+		Assert::same('SELECT * FROM user WHERE ((name LIKE ? OR name LIKE ?) OR (id LIKE ? OR id LIKE ?))', $q[0]);
+		Assert::same(['%text%', '%alternative%', '%text%', '%alternative%'], $q[1]);
+	}
+
+	public function testApplyFilterTextSplitWordsSearchDisabled()
+	{
+		$s = new NetteDatabaseDataSource($this->db, 'SELECT * FROM user');
+		$filter = new FilterText($this->grid, 'name', 'Name or id', ['name', 'id']);
+		$filter->setValue('text alternative');
+		$filter->setSplitWordsSearch(False);
+		$s->applyFilterText($filter);
+		$q = $s->getQuery();
+
+		Assert::same('SELECT * FROM user WHERE ((name LIKE ?) OR (id LIKE ?))', $q[0]);
+		Assert::same(['%text alternative%', '%text alternative%'], $q[1]);
+	}
+
+	public function testApplyFilterTextExactSearch()
+	{
+		$s = new NetteDatabaseDataSource($this->db, 'SELECT * FROM user');
+		$filter = new FilterText($this->grid, 'name', 'Name or id', ['name', 'id']);
+		$filter->setValue('text');
+		$filter->setExactSearch();
+		$s->applyFilterText($filter);
+		$q = $s->getQuery();
+
+		Assert::same('SELECT * FROM user WHERE ((name = ?) OR (id = ?))', $q[0]);
+		Assert::same(['text', 'text'], $q[1]);
+	}
+
+	public function testApplyFilterTextSplitWordsSearchDisabledExact()
+	{
+		$s = new NetteDatabaseDataSource($this->db, 'SELECT * FROM user');
+		$filter = new FilterText($this->grid, 'name', 'Name or id', ['name', 'id']);
+		$filter->setValue('text with space');
+		$filter->setSplitWordsSearch(False);
+		$filter->setExactSearch();
+		$s->applyFilterText($filter);
+		$q = $s->getQuery();
+
+		Assert::same('SELECT * FROM user WHERE ((name = ?) OR (id = ?))', $q[0]);
+		Assert::same(['text with space', 'text with space'], $q[1]);
+	}
 
 	public function testComplexQuery()
 	{
