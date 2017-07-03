@@ -7,4 +7,4 @@
 # DatagridNetteDatabaseDataSource
 Utility that makes possible to use Nette\Database native query with Ublaboo\DataGrid
 
-Please see the documentation [here](http://ublaboo.paveljanda.com/datagrid-nette-database-data-source/)
+Please see the documentation [here](https://ublaboo.org/datagrid-nette-database-data-source/)
