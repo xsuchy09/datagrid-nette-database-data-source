@@ -3,7 +3,7 @@
 	"type": "library",
 	"description": "Utility that makes possible to use Nette\\Database native query with Ublaboo\\DataGrid",
 	"keywords": ["datagrid", "grid", "nette", "ublaboo", "database", "data", "source"],
-	"homepage": "http://ublaboo.paveljanda.com/datagrid-nette-database-data-source",
+	"homepage": "https://ublaboo.org/datagrid-nette-database-data-source",
 	"license": ["MIT"],
 	"support": {
 		"issues": "https://github.com/ublaboo/datagrid-nette-database-data-source/issues"
