@@ -1,6 +1,6 @@
 <?php
 
-namespace Ublaboo\DataGrid\Tests\Files;
+namespace Ublaboo\DataGrid\Nette\Database\Tests\Files;
 
 use Nette\Http,
 	Nette;
@@ -11,7 +11,7 @@ class XTestingDataGridFactory
 	public function createXTestingDataGrid($presenterName = 'XTesting')
 	{
 		$presenterFactory = new Nette\Application\PresenterFactory;
-		$presenterFactory->setMapping(['*' => 'Ublaboo\DataGrid\Tests\Files\*Presenter']);
+		$presenterFactory->setMapping(['*' => 'Ublaboo\DataGrid\Nette\Database\Tests\Files\*Presenter']);
 
 		$presenter = $presenterFactory->createPresenter($presenterName);
 

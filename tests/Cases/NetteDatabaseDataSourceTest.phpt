@@ -43,7 +43,7 @@ final class NetteDatabaseDataSourceTest extends TestCase
 		$structure = new Structure($connection, new DevNullStorage);
 		$this->db = new Context($connection, $structure);
 
-		$factory = new Ublaboo\DataGrid\Tests\Files\XTestingDataGridFactory;
+		$factory = new Ublaboo\DataGrid\Nette\Database\Tests\Files\XTestingDataGridFactory;
 		$this->grid = $factory->createXTestingDataGrid();
 	}
 
