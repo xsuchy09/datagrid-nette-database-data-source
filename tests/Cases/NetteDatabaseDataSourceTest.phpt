@@ -11,6 +11,7 @@ use Nette\Database\Structure;
 use Tester\Assert;
 use Tester\TestCase;
 use Ublaboo;
+use Ublaboo\DataGrid\DataGrid;
 use Ublaboo\DataGrid\Filter\FilterDate;
 use Ublaboo\DataGrid\Filter\FilterDateRange;
 use Ublaboo\DataGrid\Filter\FilterRange;
@@ -20,8 +21,6 @@ use Ublaboo\DataGrid\Utils\Sorting;
 use Ublaboo\NetteDatabaseDataSource\NetteDatabaseDataSource;
 
 require __DIR__ . '/../bootstrap.php';
-require __DIR__ . '/../Files/XTestingDataGridFactory.php';
-require __DIR__ . '/../Files/XTestingPresenter.php';
 
 final class NetteDatabaseDataSourceTest extends TestCase
 {
@@ -43,8 +42,7 @@ final class NetteDatabaseDataSourceTest extends TestCase
 		$structure = new Structure($connection, new DevNullStorage());
 		$this->db = new Context($connection, $structure);
 
-		$factory = new Ublaboo\DataGrid\Nette\Database\Tests\Files\XTestingDataGridFactory();
-		$this->grid = $factory->createXTestingDataGrid();
+		$this->grid = new DataGrid;
 	}
 
 
@@ -78,7 +76,7 @@ final class NetteDatabaseDataSourceTest extends TestCase
 		$filter = new FilterSelect($this->grid, 'status', 'Status', [1 => 'Online', 0 => 'Offline'], 'user.status');
 		$filter->setValue(1);
 
-		$s->applyFilterSelect($filter);
+		$s->filter([$filter]);
 		$q = $s->getQuery();
 
 		Assert::same('SELECT * FROM user WHERE user.status = ?', $q[0]);
@@ -90,7 +88,7 @@ final class NetteDatabaseDataSourceTest extends TestCase
 		$s = new NetteDatabaseDataSource($this->db, 'SELECT * FROM user');
 		$filter = new FilterText($this->grid, 'name', 'Name', ['name']);
 		$filter->setValue('text');
-		$s->applyFilterText($filter);
+		$s->filter([$filter]);
 		$q = $s->getQuery();
 
 		Assert::same('SELECT * FROM user WHERE (name LIKE ?)', $q[0]);
@@ -102,7 +100,7 @@ final class NetteDatabaseDataSourceTest extends TestCase
 		$s = new NetteDatabaseDataSource($this->db, 'SELECT * FROM user');
 		$filter = new FilterText($this->grid, 'name', 'Name or id', ['name', 'id']);
 		$filter->setValue('text');
-		$s->applyFilterText($filter);
+		$s->filter([$filter]);
 		$q = $s->getQuery();
 
 		Assert::same('SELECT * FROM user WHERE ((name LIKE ?) OR (id LIKE ?))', $q[0]);
@@ -114,7 +112,7 @@ final class NetteDatabaseDataSourceTest extends TestCase
 		$s = new NetteDatabaseDataSource($this->db, 'SELECT * FROM user');
 		$filter = new FilterText($this->grid, 'name', 'Name or id', ['name', 'id']);
 		$filter->setValue('text alternative');
-		$s->applyFilterText($filter);
+		$s->filter([$filter]);
 		$q = $s->getQuery();
 
 		Assert::same('SELECT * FROM user WHERE ((name LIKE ? OR name LIKE ?) OR (id LIKE ? OR id LIKE ?))', $q[0]);
@@ -127,7 +125,7 @@ final class NetteDatabaseDataSourceTest extends TestCase
 		$filter = new FilterText($this->grid, 'name', 'Name or id', ['name', 'id']);
 		$filter->setValue('text alternative');
 		$filter->setSplitWordsSearch(false);
-		$s->applyFilterText($filter);
+		$s->filter([$filter]);
 		$q = $s->getQuery();
 
 		Assert::same('SELECT * FROM user WHERE ((name LIKE ?) OR (id LIKE ?))', $q[0]);
@@ -140,7 +138,7 @@ final class NetteDatabaseDataSourceTest extends TestCase
 		$filter = new FilterText($this->grid, 'name', 'Name or id', ['name', 'id']);
 		$filter->setValue('text');
 		$filter->setExactSearch();
-		$s->applyFilterText($filter);
+		$s->filter([$filter]);
 		$q = $s->getQuery();
 
 		Assert::same('SELECT * FROM user WHERE ((name = ?) OR (id = ?))', $q[0]);
@@ -154,7 +152,7 @@ final class NetteDatabaseDataSourceTest extends TestCase
 		$filter->setValue('text with space');
 		$filter->setSplitWordsSearch(false);
 		$filter->setExactSearch();
-		$s->applyFilterText($filter);
+		$s->filter([$filter]);
 		$q = $s->getQuery();
 
 		Assert::same('SELECT * FROM user WHERE ((name = ?) OR (id = ?))', $q[0]);
@@ -191,11 +189,13 @@ final class NetteDatabaseDataSourceTest extends TestCase
 		$filter5 = new FilterDate($this->grid, 'date', 'Date', 'date');
 		$filter5->setValue('12. 12. 2012');
 
-		$s->applyFilterSelect($filter1);
-		$s->applyFilterText($filter2);
-		$s->applyFilterRange($filter3);
-		$s->applyFilterDateRange($filter4);
-		$s->applyFilterDate($filter5);
+		$s->filter([
+			$filter1,
+			$filter2,
+			$filter3,
+			$filter4,
+			$filter5,
+		]);
 
 		$q = $s->getQuery();
 
@@ -218,7 +218,7 @@ final class NetteDatabaseDataSourceTest extends TestCase
 
 		Assert::same(trim(preg_replace('/\s+/', ' ', $expected_query)), $q[0]);
 
-		$expected_params = [
+		$expectedParams = [
 			3,
 			4,
 			1,
@@ -230,11 +230,9 @@ final class NetteDatabaseDataSourceTest extends TestCase
 			'2012-12-12',
 		];
 
-		Assert::same($expected_params, $q[1]);
+		Assert::same($expectedParams, $q[1]);
 	}
 
 }
 
-
-$test_case = new NetteDatabaseDataSourceTest();
-$test_case->run();
+(new NetteDatabaseDataSourceTest)->run();
