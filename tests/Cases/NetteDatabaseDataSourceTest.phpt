@@ -232,7 +232,6 @@ final class NetteDatabaseDataSourceTest extends TestCase
 
 		Assert::same($expectedParams, $q[1]);
 	}
-
 }
 
 (new NetteDatabaseDataSourceTest)->run();
