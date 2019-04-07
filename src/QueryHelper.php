@@ -1,18 +1,24 @@
 <?php
 
-/**
- * @copyright   Copyright (c) 2016 ublaboo <ublaboo@paveljanda.com>
- * @author      Pavel Janda <me@paveljanda.com>
- * @package     Ublaboo
- */
+declare(strict_types=1);
 
 namespace Ublaboo\NetteDatabaseDataSource;
 
-use PHPSQLParser\PHPSQLParser;
 use PHPSQLParser\PHPSQLCreator;
+use PHPSQLParser\PHPSQLParser;
 
 class QueryHelper
 {
+
+	/**
+	 * @var PHPSQLParser
+	 */
+	protected $sqlParser;
+
+	/**
+	 * @var PHPSQLCreator
+	 */
+	private $sqlCreator;
 
 	/**
 	 * @var array
@@ -20,7 +26,7 @@ class QueryHelper
 	protected $query;
 
 
-	public function __construct($sql)
+	public function __construct(string $sql)
 	{
 		$this->sqlParser = new PHPSQLParser;
 		$this->sqlCreator = new PHPSQLCreator;
@@ -29,7 +35,7 @@ class QueryHelper
 	}
 
 
-	public function resetQuery($sql)
+	public function resetQuery(string $sql): void
 	{
 		$this->query = $this->prepare($this->sqlParser->parse($sql));
 	}
@@ -37,18 +43,16 @@ class QueryHelper
 
 	/**
 	 * In case query contains a more complicated query, place it within brackets: (<complicated_expr>)
-	 * @param  array $query
-	 * @return array
 	 */
-	public function prepare($query)
+	public function prepare(array $query): array
 	{
-		if (!empty($query['WHERE']) && sizeof($query['WHERE']) > 1) {
+		if (isset($query['WHERE']) && sizeof($query['WHERE']) > 1) {
 			$where = $query['WHERE'];
 
 			$query['WHERE'] = [[
 				'expr_type' => 'bracket_expression',
 				'base_expr' => '',
-				'sub_tree' => $where
+				'sub_tree' => $where,
 			]];
 
 			foreach ($where as $where_data) {
@@ -62,68 +66,55 @@ class QueryHelper
 	}
 
 
-	/**
-	 * @return string
-	 */
-	public function getCountSelect()
+	public function getCountSelect(): string
 	{
 		$query = $this->query;
 
 		$query['SELECT'] = [[
 			'expr_type' => 'aggregate_function',
 			'alias' => [
-				'as'        => TRUE,
+				'as'        => true,
 				'name'      => 'count',
 				'base_expr' => 'AS count',
 				'no_quotes' => [
-					'delim' => FALSE,
-					'parts' => ['count']
-				]
+					'delim' => false,
+					'parts' => ['count'],
+				],
 			],
 			'base_expr' => 'COUNT',
 			'sub_tree'  => [[
 				'expr_type' => 'colref',
 				'base_expr' => '*',
-				'sub_tree'  => FALSE
-			]]
+				'sub_tree'  => false,
+			]],
 		]];
 
 		return $this->sqlCreator->create($query);
 	}
 
 
-	/**
-	 * @param  int $limit
-	 * @param  int $offset
-	 * @return string
-	 */
-	public function limit($limit, $offset)
+	public function limit(int $limit, int $offset): string
 	{
 		$this->query['LIMIT'] = [
 			'offset'   => $offset,
-			'rowcount' => $limit
+			'rowcount' => $limit,
 		];
 
 		return $this->sqlCreator->create($this->query);
 	}
 
 
-	/**
-	 * @param  string $column
-	 * @param  string $order
-	 * @return string
-	 */
-	public function orderBy($column, $order)
+	public function orderBy(string $column, string $order): string
 	{
 		$this->query['ORDER'] = [[
 			'expr_type' => 'colref',
 			'base_expr' => $column,
 			'no_quotes' => [
-				'delim' => FALSE,
-				'parts' => [$column]
+				'delim' => false,
+				'parts' => [$column],
 			],
-			'subtree'   => FALSE,
-			'direction' => $order
+			'subtree'   => false,
+			'direction' => $order,
 		]];
 
 		return $this->sqlCreator->create($this->query);
@@ -131,40 +122,37 @@ class QueryHelper
 
 
 	/**
-	 * @param  string $column
 	 * @param  mixed  $value
-	 * @param  string $operator
-	 * @return string
 	 */
-	public function where($column, $value, $operator)
+	public function where(string $column, $value, string $operator): string
 	{
-		if (empty($this->query['WHERE'])) {
+		if (!isset($this->query['WHERE'])) {
 			$this->query['WHERE'] = [];
 		} else {
 			$this->query['WHERE'][] = [
 				'expr_type' => 'operator',
 				'base_expr' => 'AND',
-				'sub_tree'  => FALSE
+				'sub_tree'  => false,
 			];
 		}
 
 		/**
 		 * Column
 		 */
-		if (strpos($column, '.') !== FALSE) {
+		if (strpos($column, '.') !== false) {
 			/**
 			 * Column prepanded with table/alias
 			 */
-			list($alias, $column) = explode('.', $column);
+			[$alias, $column] = explode('.', $column);
 
 			$this->query['WHERE'][] = [
 				'expr_type' => 'colref',
 				'base_expr' => "{$alias}.{$column}",
 				'no_quotes' => [
 					'delim' => '.',
-					'parts' => [$alias, $column]
+					'parts' => [$alias, $column],
 				],
-				'sub_tree'  => FALSE
+				'sub_tree'  => false,
 			];
 		} else {
 			/**
@@ -174,10 +162,10 @@ class QueryHelper
 				'expr_type' => 'colref',
 				'base_expr' => $column,
 				'no_quotes' => [
-					'delim' => FALSE,
-					'parts' => [$column]
+					'delim' => false,
+					'parts' => [$column],
 				],
-				'sub_tree'  => FALSE
+				'sub_tree'  => false,
 			];
 		}
 
@@ -187,7 +175,7 @@ class QueryHelper
 		$this->query['WHERE'][] = [
 			'expr_type' => 'operator',
 			'base_expr' => $operator,
-			'sub_tree'  => FALSE
+			'sub_tree'  => false,
 		];
 
 		/**
@@ -197,26 +185,22 @@ class QueryHelper
 		$this->query['WHERE'][] = [
 			'expr_type' => 'const',
 			'base_expr' => $value,
-			'sub_tree'  => FALSE
+			'sub_tree'  => false,
 		];
 
 		return $this->sqlCreator->create($this->query);
 	}
 
 
-	/**
-	 * @param  string $sql
-	 * @return string
-	 */
-	public function whereSql($sql)
+	public function whereSql(string $sql): string
 	{
-		if (empty($this->query['WHERE'])) {
+		if (!isset($this->query['WHERE'])) {
 			$this->query['WHERE'] = [];
 		} else {
 			$this->query['WHERE'][] = [
 				'expr_type' => 'operator',
 				'base_expr' => 'AND',
-				'sub_tree'  => FALSE
+				'sub_tree'  => false,
 			];
 		}
 

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ublaboo\DataGrid\Nette\Database\Tests\Files;
 
 use Nette;
@@ -10,7 +12,7 @@ final class ExportTestingPresenter extends Nette\Application\UI\Presenter
 
 	protected function createComponentGrid($name)
 	{
-		$grid = new DataGrid(NULL, $name);
+		$grid = new DataGrid(null, $name);
 		$grid->addExportCsv('export', 'export.csv');
 
 		return $grid;

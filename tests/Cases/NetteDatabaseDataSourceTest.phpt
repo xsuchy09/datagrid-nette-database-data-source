@@ -1,22 +1,23 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ublaboo\DataGrid\Tests\Cases;
 
-use Tester\TestCase;
-use Tester\Assert;
-use Mockery;
+use Nette\Caching\Storages\DevNullStorage;
 use Nette\Database\Connection;
 use Nette\Database\Context;
 use Nette\Database\Structure;
-use Nette\Caching\Storages\DevNullStorage;
-use Ublaboo\NetteDatabaseDataSource\NetteDatabaseDataSource;
-use Ublaboo\DataGrid\Utils\Sorting;
-use Ublaboo\DataGrid\Filter\FilterSelect;
-use Ublaboo\DataGrid\Filter\FilterText;
+use Tester\Assert;
+use Tester\TestCase;
+use Ublaboo;
 use Ublaboo\DataGrid\Filter\FilterDate;
 use Ublaboo\DataGrid\Filter\FilterDateRange;
 use Ublaboo\DataGrid\Filter\FilterRange;
-use Ublaboo;
+use Ublaboo\DataGrid\Filter\FilterSelect;
+use Ublaboo\DataGrid\Filter\FilterText;
+use Ublaboo\DataGrid\Utils\Sorting;
+use Ublaboo\NetteDatabaseDataSource\NetteDatabaseDataSource;
 
 require __DIR__ . '/../bootstrap.php';
 require __DIR__ . '/../Files/XTestingDataGridFactory.php';
@@ -35,20 +36,19 @@ final class NetteDatabaseDataSourceTest extends TestCase
 	 */
 	private $grid;
 
-
-	public function setUp()
+	public function setUp(): void
 	{
-		$connection = new Connection('.', NULL, NULL, ['lazy' => TRUE]);
+		$connection = new Connection('.', null, null, ['lazy' => true]);
 
-		$structure = new Structure($connection, new DevNullStorage);
+		$structure = new Structure($connection, new DevNullStorage());
 		$this->db = new Context($connection, $structure);
 
-		$factory = new Ublaboo\DataGrid\Nette\Database\Tests\Files\XTestingDataGridFactory;
+		$factory = new Ublaboo\DataGrid\Nette\Database\Tests\Files\XTestingDataGridFactory();
 		$this->grid = $factory->createXTestingDataGrid();
 	}
 
 
-	public function testQuery()
+	public function testQuery(): void
 	{
 		$s = new NetteDatabaseDataSource($this->db, 'SELECT * FROM user');
 
@@ -60,7 +60,7 @@ final class NetteDatabaseDataSourceTest extends TestCase
 	}
 
 
-	public function testSort()
+	public function testSort(): void
 	{
 		$s = new NetteDatabaseDataSource($this->db, 'SELECT * FROM user');
 		$sorting = new Sorting(['user.name' => 'DESC']);
@@ -72,7 +72,7 @@ final class NetteDatabaseDataSourceTest extends TestCase
 	}
 
 
-	public function testApplyFilterSelect()
+	public function testApplyFilterSelect(): void
 	{
 		$s = new NetteDatabaseDataSource($this->db, 'SELECT * FROM user');
 		$filter = new FilterSelect($this->grid, 'status', 'Status', [1 => 'Online', 0 => 'Offline'], 'user.status');
@@ -85,7 +85,7 @@ final class NetteDatabaseDataSourceTest extends TestCase
 		Assert::same([1], $q[1]);
 	}
 
-	public function testApplyFilterText()
+	public function testApplyFilterText(): void
 	{
 		$s = new NetteDatabaseDataSource($this->db, 'SELECT * FROM user');
 		$filter = new FilterText($this->grid, 'name', 'Name', ['name']);
@@ -97,7 +97,7 @@ final class NetteDatabaseDataSourceTest extends TestCase
 		Assert::same(['%text%'], $q[1]);
 	}
 
-	public function testApplyFilterTextDouble()
+	public function testApplyFilterTextDouble(): void
 	{
 		$s = new NetteDatabaseDataSource($this->db, 'SELECT * FROM user');
 		$filter = new FilterText($this->grid, 'name', 'Name or id', ['name', 'id']);
@@ -109,7 +109,7 @@ final class NetteDatabaseDataSourceTest extends TestCase
 		Assert::same(['%text%', '%text%'], $q[1]);
 	}
 
-	public function testApplyFilterTextSplitWordsSearch()
+	public function testApplyFilterTextSplitWordsSearch(): void
 	{
 		$s = new NetteDatabaseDataSource($this->db, 'SELECT * FROM user');
 		$filter = new FilterText($this->grid, 'name', 'Name or id', ['name', 'id']);
@@ -121,12 +121,12 @@ final class NetteDatabaseDataSourceTest extends TestCase
 		Assert::same(['%text%', '%alternative%', '%text%', '%alternative%'], $q[1]);
 	}
 
-	public function testApplyFilterTextSplitWordsSearchDisabled()
+	public function testApplyFilterTextSplitWordsSearchDisabled(): void
 	{
 		$s = new NetteDatabaseDataSource($this->db, 'SELECT * FROM user');
 		$filter = new FilterText($this->grid, 'name', 'Name or id', ['name', 'id']);
 		$filter->setValue('text alternative');
-		$filter->setSplitWordsSearch(False);
+		$filter->setSplitWordsSearch(false);
 		$s->applyFilterText($filter);
 		$q = $s->getQuery();
 
@@ -134,7 +134,7 @@ final class NetteDatabaseDataSourceTest extends TestCase
 		Assert::same(['%text alternative%', '%text alternative%'], $q[1]);
 	}
 
-	public function testApplyFilterTextExactSearch()
+	public function testApplyFilterTextExactSearch(): void
 	{
 		$s = new NetteDatabaseDataSource($this->db, 'SELECT * FROM user');
 		$filter = new FilterText($this->grid, 'name', 'Name or id', ['name', 'id']);
@@ -147,12 +147,12 @@ final class NetteDatabaseDataSourceTest extends TestCase
 		Assert::same(['text', 'text'], $q[1]);
 	}
 
-	public function testApplyFilterTextSplitWordsSearchDisabledExact()
+	public function testApplyFilterTextSplitWordsSearchDisabledExact(): void
 	{
 		$s = new NetteDatabaseDataSource($this->db, 'SELECT * FROM user');
 		$filter = new FilterText($this->grid, 'name', 'Name or id', ['name', 'id']);
 		$filter->setValue('text with space');
-		$filter->setSplitWordsSearch(False);
+		$filter->setSplitWordsSearch(false);
 		$filter->setExactSearch();
 		$s->applyFilterText($filter);
 		$q = $s->getQuery();
@@ -161,7 +161,7 @@ final class NetteDatabaseDataSourceTest extends TestCase
 		Assert::same(['text with space', 'text with space'], $q[1]);
 	}
 
-	public function testComplexQuery()
+	public function testComplexQuery(): void
 	{
 		$q =
 			'SELECT u.name, u.age, p.name, p.surname, p2.name, p2.surname CASE WHEN p3.age THEN p3.age ELSE 8 END
@@ -183,7 +183,7 @@ final class NetteDatabaseDataSourceTest extends TestCase
 		$filter2->setValue('text');
 
 		$filter3 = new FilterRange($this->grid, 'range', 'Range', 'id', 'To');
-		$filter3->setValue(['from' => 2, 'to' => NULL]);
+		$filter3->setValue(['from' => 2, 'to' => null]);
 
 		$filter4 = new FilterDateRange($this->grid, 'date range', 'Date Range', 'created', '-');
 		$filter4->setValue(['from' => '1. 2. 2003', 'to' => '3. 12. 2149']);
@@ -199,7 +199,7 @@ final class NetteDatabaseDataSourceTest extends TestCase
 
 		$q = $s->getQuery();
 
-		$expected_query = 
+		$expected_query =
 			'SELECT u.name, u.age, p.name, p.surname, p2.name, p2.surname CASE WHEN p3.age THEN p3.age ELSE 8 END
 			FROM user u
 			LEFT JOIN parent p
@@ -222,12 +222,12 @@ final class NetteDatabaseDataSourceTest extends TestCase
 			3,
 			4,
 			1,
-			"%text%",
-			"%text%",
+			'%text%',
+			'%text%',
 			2,
-			"2003-02-01",
-			"2149-12-03",
-			"2012-12-12",
+			'2003-02-01',
+			'2149-12-03',
+			'2012-12-12',
 		];
 
 		Assert::same($expected_params, $q[1]);
@@ -236,5 +236,5 @@ final class NetteDatabaseDataSourceTest extends TestCase
 }
 
 
-$test_case = new NetteDatabaseDataSourceTest;
+$test_case = new NetteDatabaseDataSourceTest();
 $test_case->run();
