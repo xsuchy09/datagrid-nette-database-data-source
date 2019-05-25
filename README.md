@@ -20,7 +20,7 @@ Download this package using composer:
 composer require ublaboo/datagrid-nette-database-data-source
 ```
 
-Now create new datagrid component with `NetteDatabaseDataSource` as a data source (It is a little bit different that setting for example `Dibi\Fluent` or Doctrine data source):
+## Usage
 
 ```php
 /**
