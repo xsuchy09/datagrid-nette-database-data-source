@@ -410,16 +410,13 @@ class NetteDatabaseDataSource implements IDataSource
 	public function sort(Sorting $sorting)
 	{
 		if (is_callable($sorting->getSortCallback())) {
-			call_user_func(
+			$sort = call_user_func(
 				$sorting->getSortCallback(),
-				$this->sql,
 				$sorting->getSort()
 			);
-
-			return $this;
+		} else {
+			$sort = $sorting->getSort();
 		}
-
-		$sort = $sorting->getSort();
 
 		if (!empty($sort)) {
 			foreach ($sort as $column => $order) {
